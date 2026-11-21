@@ -1,0 +1,16 @@
+import { Outlet } from 'react-router-dom'
+import AnnouncementBar from './AnnouncementBar'
+import Header from './Header'
+import Footer from './Footer'
+
+export default function Layout() {
+  return (
+    <>
+      <AnnouncementBar />
+      <Header cartCount={0} />
+      <main><Outlet /></main>
+      <Footer />
+    </>
+  )
+
+}

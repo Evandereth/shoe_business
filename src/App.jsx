@@ -1,14 +1,21 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import Layout from './components/layout/Layout'
 
+import Home from './pages/Home'
+// import Shop from './pages/Shop'
+// import Product from './pages/Product'
 
-function App() {
-
+export default function App() {
   return (
-    <>
-      <h1 className="text-3xl font-bold underline">
-        hello world
-      </h1>
-    </>
+    <BrowserRouter>
+<Routes>
+  <Route element={<Layout />}>
+    <Route path="/" element={<Home />} />
+    {/* <Route path="/shop" element={<Shop />} />
+    <Route path="/shop/:category" element={<Shop />} />
+    <Route path="/product/:slug" element={<Product />} /> */}
+  </Route>
+</Routes>
+    </BrowserRouter>
   )
 }
-
-export default App
