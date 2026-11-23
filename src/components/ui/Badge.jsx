@@ -1,7 +1,6 @@
 const styles = {
   ready: 'bg-paper text-ink',
   made: 'bg-paper text-ink',
-  sale: 'bg-ink text-paper',
   soldout: 'bg-stone text-mute',
 }
 

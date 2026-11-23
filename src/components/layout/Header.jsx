@@ -1,13 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { CATEGORIES } from '../../lib/catalog'
 
 const links = [
   { to: '/shop', label: 'New in' },
-  { to: '/shop/loafers', label: 'Loafers' },
-  { to: '/shop/oxfords', label: 'Oxfords' },
-  { to: '/shop/slippers', label: 'Slippers' },
-  { to: '/shop/boots', label: 'Boots' },
-  { to: '/shop/sandals', label: 'Sandals' },
+  ...CATEGORIES.map((c) => ({ to: `/shop/${c.slug}`, label: c.name })),
   { to: '/size-guide', label: 'Measure your foot' },
 ]
 
@@ -20,16 +17,36 @@ const Icon = ({ d }) => (
 const icons = {
   menu: 'M4 7h16M4 12h16M4 17h16',
   close: 'M6 6l12 12M18 6L6 18',
-  search: 'M11 4a7 7 0 100 14 7 7 0 000-14zM21 21l-4.3-4.3',
-  heart: 'M12 20s-7-4.6-7-10a4 4 0 017-2.6A4 4 0 0119 10c0 5.4-7 10-7 10z',
-  user: 'M12 12a4 4 0 100-8 4 4 0 000 8zM4 21a8 8 0 0116 0',
   bag: 'M6 8h12l1 12H5L6 8zM9 8V6a3 3 0 016 0v2',
 }
 
 export default function Header({ cartCount = 0, onCartClick }) {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
+  const menuButtonRef = useRef(null)
+  const mobileMenuRef = useRef(null)
   const navigate = useNavigate()
+
+  useEffect(() => {
+    if (!open) return
+
+    const closeOnOutsideClick = (event) => {
+      if (
+        !menuButtonRef.current?.contains(event.target) &&
+        !mobileMenuRef.current?.contains(event.target)
+      ) {
+        setOpen(false)
+      }
+    }
+    const closeOnScroll = () => setOpen(false)
+
+    document.addEventListener('pointerdown', closeOnOutsideClick)
+    window.addEventListener('scroll', closeOnScroll, { passive: true })
+    return () => {
+      document.removeEventListener('pointerdown', closeOnOutsideClick)
+      window.removeEventListener('scroll', closeOnScroll)
+    }
+  }, [open])
 
   const handleSearch = (e) => {
     e.preventDefault()
@@ -43,21 +60,20 @@ export default function Header({ cartCount = 0, onCartClick }) {
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-paper">
       <div className="container-x flex h-16 items-center gap-4 md:gap-8">
-        {/* Mobile menu button */}
         <button
-          className="md:hidden"
+          ref={menuButtonRef}
+          type="button"
+          className="md:hidden cursor-pointer"
           onClick={() => setOpen(!open)}
           aria-label={open ? 'Close menu' : 'Open menu'}
           aria-expanded={open}
+          aria-controls="mobile-navigation"
         >
           <Icon d={open ? icons.close : icons.menu} />
         </button>
 
-        <Link to="/" className="font-logo text-2xl font-bold italic">
-          Stilebyb
-        </Link>
+        <Link to="/" className="font-logo text-2xl font-bold italic">Stilebyb</Link>
 
-        {/* Desktop search */}
         <form onSubmit={handleSearch} className="hidden flex-1 md:block">
           <label className="sr-only" htmlFor="site-search">Search</label>
           <input
@@ -70,13 +86,11 @@ export default function Header({ cartCount = 0, onCartClick }) {
         </form>
 
         <div className="ml-auto flex items-center gap-5 text-sm md:ml-0">
-          <Link to="/account" className="hidden items-center gap-1.5 md:flex" aria-label="Account">
-            <Icon d={icons.user} /> Account
-          </Link>
-          <Link to="/wishlist" className="hidden items-center gap-1.5 md:flex" aria-label="Wishlist">
-            <Icon d={icons.heart} /> Wishlist
-          </Link>
-          <button onClick={onCartClick} className="relative flex items-center gap-1.5 font-semibold" aria-label={`Bag, ${cartCount} items`}>
+          <button
+            onClick={onCartClick}
+            className="flex items-center gap-1.5 font-semibold"
+            aria-label={`Bag, ${cartCount} items`}
+          >
             <Icon d={icons.bag} />
             <span className="hidden md:inline">Bag</span>
             <span className="rounded-full bg-ink px-1.5 text-[11px] leading-5 text-paper">{cartCount}</span>
@@ -84,7 +98,6 @@ export default function Header({ cartCount = 0, onCartClick }) {
         </div>
       </div>
 
-      {/* Desktop category nav */}
       <nav className="hidden border-t border-line md:block" aria-label="Main">
         <ul className="container-x flex gap-8 py-3 text-sm">
           {links.map((l) => (
@@ -100,15 +113,11 @@ export default function Header({ cartCount = 0, onCartClick }) {
               </NavLink>
             </li>
           ))}
-          <li className="ml-auto">
-            <NavLink to="/shop?sale=1" className="font-semibold">Sale</NavLink>
-          </li>
         </ul>
       </nav>
 
-      {/* Mobile menu */}
       {open && (
-        <div className="border-t border-line bg-paper md:hidden">
+        <div ref={mobileMenuRef} id="mobile-navigation" className="border-t border-line bg-paper md:hidden">
           <form onSubmit={handleSearch} className="px-4 pt-4">
             <input
               value={query}
@@ -126,10 +135,6 @@ export default function Header({ cartCount = 0, onCartClick }) {
                 </NavLink>
               </li>
             ))}
-            <li className="flex gap-6 pt-4 text-sm">
-              <Link to="/account" onClick={() => setOpen(false)}>Account</Link>
-              <Link to="/wishlist" onClick={() => setOpen(false)}>Wishlist</Link>
-            </li>
           </ul>
         </div>
       )}
