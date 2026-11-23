@@ -107,9 +107,9 @@ export default function Home() {
           </ol>
         </div>
 
-        <div className='w-90 h-80 rounded-2xl bg-white'>
+        {/* <div className='w-90 h-80 rounded-2xl bg-white'>
           <img src="" alt="an image for measuring your foot" />
-        </div>
+        </div> */}
       </section>
 
       <Row title="Best sellers" subtitle="The pairs customers order again" items={best} />
