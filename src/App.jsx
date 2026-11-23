@@ -5,7 +5,7 @@ import Shop from './pages/Shop'
 import Product from './pages/Product'
 import Checkout from './pages/Checkout'
 import InfoPage from './pages/InfoPage'
-import { CartProvider } from './context/CartContext'
+import { CartProvider } from './context/cartContext.jsx'
 
 function NotFound() {
   return (
